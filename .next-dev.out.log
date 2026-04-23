@@ -1,0 +1,43 @@
+
+> starthub-mvp@0.1.0 dev
+> next dev -p 3000
+
+   ▲ Next.js 15.5.15
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.1.4:3000
+   - Environments: .env
+   - Experiments (use with caution):
+     · serverActions
+
+ ✓ Starting...
+ ✓ Ready in 2.8s
+ ○ Compiling / ...
+ ✓ Compiled / in 10.3s (12752 modules)
+ GET / 200 in 574ms
+ ○ Compiling /campaigns/[slug] ...
+ ✓ Compiled /campaigns/[slug] in 3.1s (12778 modules)
+ GET /campaigns/nuvia-robotics-tohum-turu 200 in 4068ms
+ ○ Compiling /api/documents/view ...
+ ✓ Compiled /api/documents/view in 1535ms (12809 modules)
+ POST /api/documents/view 200 in 1801ms
+ ✓ Compiled in 2.1s (4803 modules)
+ ✓ Compiled in 476ms (4803 modules)
+ GET / 200 in 2651ms
+ GET / 200 in 829ms
+ GET / 200 in 285ms
+ ✓ Compiled in 1091ms (4803 modules)
+ GET / 200 in 187ms
+ ✓ Compiled in 1675ms (12823 modules)
+ GET / 200 in 335ms
+ ✓ Compiled in 1355ms (12793 modules)
+ GET / 200 in 389ms
+ ✓ Compiled in 1613ms (12793 modules)
+ GET / 200 in 358ms
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 2s (13125 modules)
+ GET / 500 in 5817ms
+ ○ Compiling /compliance ...
+ ✓ Compiled /compliance in 1859ms (13130 modules)
+ GET /compliance 200 in 3032ms
+ GET /compliance 200 in 227ms
+ GET / 200 in 522ms

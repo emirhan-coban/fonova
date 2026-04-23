@@ -1,0 +1,229 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  INVESTOR
+  FOUNDER
+  ADMIN
+}
+
+enum InvestorTier {
+  RETAIL
+  QUALIFIED
+}
+
+enum KycStatus {
+  PENDING
+  VERIFIED
+  ESCALATED
+  REJECTED
+}
+
+enum CompanyStatus {
+  DRAFT
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum CampaignStatus {
+  DRAFT
+  UNDER_REVIEW
+  APPROVED
+  LIVE
+  FUNDED
+  FAILED
+  CANCELLED
+}
+
+enum InvestmentStatus {
+  PENDING_COOLING_OFF
+  CONFIRMED
+  CANCELLED
+  REFUNDED
+}
+
+enum LedgerEntryType {
+  ESCROW_HOLD
+  LIMIT_DECREASE
+  LIMIT_RELEASE
+  REFUND
+  SHARE_REGISTRATION
+}
+
+enum ComplianceStatus {
+  PASSED
+  BLOCKED
+  REVIEW
+}
+
+enum ReviewDecision {
+  APPROVED
+  REJECTED
+  CHANGES_REQUESTED
+}
+
+model User {
+  id              String             @id @default(cuid())
+  email           String             @unique
+  name            String
+  password        String
+  role            Role
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  investorProfile InvestorProfile?
+  companies       Company[]          @relation("FounderCompanies")
+  investments     InvestmentIntent[] @relation("InvestorInvestments")
+  reviews         AdminReview[]      @relation("ReviewerReviews")
+  complianceLogs  ComplianceCheck[]
+  documentViews   DocumentView[]
+}
+
+model InvestorProfile {
+  id                String       @id @default(cuid())
+  userId            String       @unique
+  user              User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tier              InvestorTier @default(RETAIL)
+  kycStatus         KycStatus    @default(PENDING)
+  annualIncomeKurus Int          @default(0)
+  yearlyLimitKurus  Int          @default(0)
+  usedLimitKurus    Int          @default(0)
+  mkkSicilNo        String?
+  riskScore         Int          @default(42)
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+}
+
+model Company {
+  id                String        @id @default(cuid())
+  founderId         String
+  founder           User          @relation("FounderCompanies", fields: [founderId], references: [id], onDelete: Cascade)
+  name              String
+  slug              String        @unique
+  sector            String
+  city              String
+  foundedYear       Int
+  incorporationType String
+  description       String
+  status            CompanyStatus @default(DRAFT)
+  logoSeed          String
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  campaigns         Campaign[]
+}
+
+model Campaign {
+  id                   String             @id @default(cuid())
+  companyId            String
+  company              Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  slug                 String             @unique
+  title                String
+  summary              String
+  longPitch            String
+  status               CampaignStatus     @default(DRAFT)
+  targetAmountKurus    Int
+  minInvestmentKurus   Int
+  committedAmountKurus Int                @default(0)
+  equityOfferedBps     Int
+  startDate            DateTime
+  endDate              DateTime
+  publishedAt          DateTime?
+  approvedAt           DateTime?
+  coverSeed            String
+  riskRating           String
+  leadInvestorName     String
+  leadCommitmentKurus  Int
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  documents            CampaignDocument[]
+  investments          InvestmentIntent[]
+  reviews              AdminReview[]
+  complianceChecks     ComplianceCheck[]
+}
+
+model CampaignDocument {
+  id               String         @id @default(cuid())
+  campaignId       String
+  campaign         Campaign       @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  title            String
+  pageCount        Int
+  restricted       Boolean        @default(true)
+  watermarkEnabled Boolean        @default(true)
+  views            Int            @default(0)
+  engagementScore  Int            @default(0)
+  createdAt        DateTime       @default(now())
+  documentViews    DocumentView[]
+}
+
+model InvestmentIntent {
+  id                String            @id @default(cuid())
+  campaignId        String
+  campaign          Campaign          @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  investorId        String
+  investor          User              @relation("InvestorInvestments", fields: [investorId], references: [id], onDelete: Cascade)
+  amountKurus       Int
+  status            InvestmentStatus  @default(PENDING_COOLING_OFF)
+  coolingOffEndsAt  DateTime
+  cancelledAt       DateTime?
+  confirmedAt       DateTime?
+  mkkReference      String
+  escrowReference   String
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  ledgerEntries     MockLedgerEntry[]
+  complianceChecks  ComplianceCheck[]
+}
+
+model MockLedgerEntry {
+  id           String           @id @default(cuid())
+  investmentId String
+  investment   InvestmentIntent @relation(fields: [investmentId], references: [id], onDelete: Cascade)
+  type         LedgerEntryType
+  amountKurus  Int
+  description  String
+  createdAt    DateTime         @default(now())
+}
+
+model ComplianceCheck {
+  id           String           @id @default(cuid())
+  userId       String?
+  user         User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  campaignId   String?
+  campaign     Campaign?        @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  investmentId String?
+  investment   InvestmentIntent? @relation(fields: [investmentId], references: [id], onDelete: SetNull)
+  type         String
+  status       ComplianceStatus
+  code         String
+  message      String
+  metadata     String
+  createdAt    DateTime         @default(now())
+}
+
+model AdminReview {
+  id         String         @id @default(cuid())
+  campaignId String
+  campaign   Campaign       @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  reviewerId String
+  reviewer   User           @relation("ReviewerReviews", fields: [reviewerId], references: [id], onDelete: Cascade)
+  decision   ReviewDecision
+  note       String
+  createdAt  DateTime       @default(now())
+}
+
+model DocumentView {
+  id         String           @id @default(cuid())
+  documentId String
+  document   CampaignDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  page       Int
+  seconds    Int
+  createdAt  DateTime         @default(now())
+}
