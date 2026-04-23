@@ -1,6 +1,6 @@
 import { CampaignStatus, ComplianceStatus, ReviewDecision } from "@prisma/client";
 import { prisma } from "@/lib/db";
-import type { ServiceResult } from "./investments";
+import type { ServiceResult } from "./types";
 
 export async function reviewCampaign(input: {
   campaignId: string;
