@@ -1,13 +1,56 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { CampaignStatus, InvestmentStatus } from "@prisma/client";
+import { CampaignStatus, InvestmentStatus, KycStatus } from "@prisma/client";
 import { CancelInvestmentButton } from "@/components/CancelInvestmentButton";
 import { InvestmentPanel } from "@/components/InvestmentPanel";
+import { KycVerificationPanel } from "@/components/KycVerificationPanel";
 import { MetricPill } from "@/components/MetricPill";
 import { SecureDocumentViewer } from "@/components/SecureDocumentViewer";
 import { campaignProgress, daysRemaining, isCoolingOffOpen } from "@/lib/campaigns";
 import { prisma } from "@/lib/db";
 import { campaignStatusLabel, complianceStatusLabel, investmentStatusLabel } from "@/lib/labels";
 import { formatCompactTRY, formatTRY } from "@/lib/money";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://fonova.co";
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const campaign = await prisma.campaign.findUnique({
+    where: { slug },
+    include: { company: true }
+  });
+
+  if (!campaign) {
+    return { title: "Kampanya Bulunamadı — Fonova" };
+  }
+
+  const title = `${campaign.title} — ${campaign.company.name} | Fonova`;
+  const description = campaign.summary;
+  const ogImage = `https://picsum.photos/seed/${campaign.coverSeed}/1200/630`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `${SITE_URL}/campaigns/${slug}`,
+      siteName: "Fonova",
+      images: [{ url: ogImage, width: 1200, height: 630, alt: campaign.title }],
+      locale: "tr_TR",
+      type: "website"
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImage]
+    },
+    alternates: {
+      canonical: `${SITE_URL}/campaigns/${slug}`
+    }
+  };
+}
 
 export default async function CampaignPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -44,9 +87,33 @@ export default async function CampaignPage({ params }: { params: Promise<{ slug:
   const demoRemainingLimit = investor?.investorProfile ? investor.investorProfile.yearlyLimitKurus - investor.investorProfile.usedLimitKurus : 0;
   const document = campaign.documents[0];
   const activeInvestment = campaign.investments.find((investment) => investment.investorId === investor?.id && investment.status === InvestmentStatus.PENDING_COOLING_OFF);
+  const kycStatus = investor?.investorProfile?.kycStatus ?? KycStatus.PENDING;
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "InvestmentOrDeposit",
+    name: campaign.title,
+    description: campaign.summary,
+    url: `${SITE_URL}/campaigns/${campaign.slug}`,
+    image: `https://picsum.photos/seed/${campaign.coverSeed}/1200/630`,
+    provider: {
+      "@type": "Organization",
+      name: campaign.company.name,
+      url: SITE_URL
+    },
+    amount: {
+      "@type": "MonetaryAmount",
+      currency: "TRY",
+      value: campaign.targetAmountKurus / 100
+    }
+  };
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* ─── Hero ─────────────────────────────────────────────── */}
       <section className="grid gap-6 py-8 sm:gap-8 sm:py-10 lg:grid-cols-[1.1fr_0.9fr]">
         <div className="fade-up">
@@ -107,6 +174,13 @@ export default async function CampaignPage({ params }: { params: Promise<{ slug:
       {/* ─── Investment + Commitments + Document ──────────────── */}
       <section className="grid gap-6 py-10 sm:py-12 lg:grid-cols-[0.95fr_1.05fr]">
         <div className="space-y-6">
+          {kycStatus !== KycStatus.VERIFIED && campaign.status === CampaignStatus.LIVE && (
+            <KycVerificationPanel
+              currentStatus={kycStatus}
+              investorEmail={investor?.email ?? "yatirimci@starthub.test"}
+            />
+          )}
+
           {campaign.status === CampaignStatus.LIVE ? (
             <InvestmentPanel
               campaignSlug={campaign.slug}

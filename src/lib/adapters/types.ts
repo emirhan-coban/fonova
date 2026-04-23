@@ -18,5 +18,6 @@ export interface EscrowAdapter {
 }
 
 export interface KycAdapter {
-  verifyIdentity(input: { userId: string; fullName: string; identityHint: string }): Promise<AdapterResult>;
+  verifyIdentity(input: { userId: string; fullName: string; tcKimlikNo: string }): Promise<AdapterResult>;
+  checkStatus(input: { userId: string; reference: string }): Promise<AdapterResult>;
 }

@@ -1,6 +1,3 @@
 {
-  "buildCommand": "npm run vercel-build",
-  "env": {
-    "DATABASE_URL": "file:/tmp/starthub-demo.db"
-  }
+  "buildCommand": "prisma generate && next build"
 }

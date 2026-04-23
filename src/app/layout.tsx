@@ -10,10 +10,34 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   display: "swap"
 });
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://fonova.co";
+
 export const metadata: Metadata = {
-  title: "Fonova - Startup Yatırım ve Destek Platformu",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Fonova — Startup Yatırım ve Destek Platformu",
+    template: "%s | Fonova"
+  },
   description:
-    "Paya dayalı kitle fonlaması ve gönüllü destek projelerini aynı çatı altında sunan Fonova MVP deneyimi."
+    "Paya dayalı kitle fonlaması ve gönüllü destek projelerini aynı çatı altında sunan Fonova platformu.",
+  openGraph: {
+    type: "website",
+    locale: "tr_TR",
+    siteName: "Fonova",
+    url: SITE_URL,
+    images: [{ url: `${SITE_URL}/branding/fonova-logo-star-v1-transparent.png`, width: 320, height: 84, alt: "Fonova" }]
+  },
+  twitter: {
+    card: "summary_large_image"
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-video-preview": -1, "max-image-preview": "large", "max-snippet": -1 }
+  },
+  alternates: {
+    canonical: SITE_URL
+  }
 };
 
 const navItems = [

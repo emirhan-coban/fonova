@@ -1,10 +1,12 @@
-import { PrismaClient, CampaignStatus, CompanyStatus, KycStatus, Role, InvestorTier, InvestmentStatus, LedgerEntryType, ComplianceStatus, ReviewDecision } from "@prisma/client";
+import { PrismaClient, CampaignStatus, CompanyStatus, KycStatus, Role, InvestorTier, InvestmentStatus, LedgerEntryType, ComplianceStatus, ReviewDecision, SupportProjectStatus } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 const tl = (value: number) => Math.round(value * 100);
 
 async function main() {
+  await prisma.volunteerContribution.deleteMany();
+  await prisma.supportProject.deleteMany();
   await prisma.mockLedgerEntry.deleteMany();
   await prisma.complianceCheck.deleteMany();
   await prisma.documentView.deleteMany();
@@ -283,6 +285,50 @@ async function main() {
       decision: ReviewDecision.APPROVED,
       note: "Demo veri seti için kampanya yayına alınmıştır."
     }
+  });
+
+  await prisma.supportProject.createMany({
+    data: [
+      {
+        title: "Anadolu kurucuları için gönüllü mentorluk ağı",
+        organization: "Fonova Etki Programı",
+        city: "Eskişehir",
+        category: "Mentorluk",
+        summary: "İlk kez şirket kuran ekiplerin finansal model, ürün anlatısı ve yatırımcı sunumu hazırlıklarına destek olur.",
+        goal: "40 mentor görüşmesi",
+        progress: 62,
+        volunteersNeeded: 18,
+        supportType: "Zaman ve uzmanlık",
+        seed: "starthub-volunteer-mentorship",
+        status: SupportProjectStatus.ACTIVE
+      },
+      {
+        title: "İklim girişimleri için saha doğrulama laboratuvarı",
+        organization: "Açık İnovasyon Gönüllüleri",
+        city: "İzmir",
+        category: "Saha desteği",
+        summary: "Erken aşama iklim teknolojilerinin prototip testlerinde mühendislik, ölçüm ve raporlama desteği sağlar.",
+        goal: "12 saha testi",
+        progress: 48,
+        volunteersNeeded: 9,
+        supportType: "Teknik gönüllülük",
+        seed: "starthub-climate-lab",
+        status: SupportProjectStatus.ACTIVE
+      },
+      {
+        title: "Kadın kurucular için topluluk destek havuzu",
+        organization: "Fonova Topluluk",
+        city: "İstanbul",
+        category: "Topluluk",
+        summary: "Gönüllü mikro destekler, tasarım yardımı ve görünürlük katkısıyla kadın kurucuların ilk müşteri görüşmelerini hızlandırır.",
+        goal: "120 destekçi",
+        progress: 71,
+        volunteersNeeded: 32,
+        supportType: "Gönüllü katkı",
+        seed: "starthub-women-founders",
+        status: SupportProjectStatus.ACTIVE
+      }
+    ]
   });
 }
 

@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -69,6 +69,20 @@ enum ReviewDecision {
   CHANGES_REQUESTED
 }
 
+enum SupportProjectStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum VolunteerStatus {
+  APPLIED
+  ACCEPTED
+  COMPLETED
+  WITHDRAWN
+}
+
 model User {
   id              String             @id @default(cuid())
   email           String             @unique
@@ -81,8 +95,9 @@ model User {
   companies       Company[]          @relation("FounderCompanies")
   investments     InvestmentIntent[] @relation("InvestorInvestments")
   reviews         AdminReview[]      @relation("ReviewerReviews")
-  complianceLogs  ComplianceCheck[]
-  documentViews   DocumentView[]
+  complianceLogs          ComplianceCheck[]
+  documentViews           DocumentView[]
+  volunteerContributions  VolunteerContribution[]
 }
 
 model InvestorProfile {
@@ -226,4 +241,34 @@ model DocumentView {
   page       Int
   seconds    Int
   createdAt  DateTime         @default(now())
+}
+
+model SupportProject {
+  id               String                 @id @default(cuid())
+  title            String
+  organization     String
+  city             String
+  category         String
+  summary          String
+  goal             String
+  progress         Int                    @default(0)
+  volunteersNeeded Int                    @default(0)
+  supportType      String
+  seed             String
+  status           SupportProjectStatus   @default(ACTIVE)
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
+  contributions    VolunteerContribution[]
+}
+
+model VolunteerContribution {
+  id               String           @id @default(cuid())
+  supportProjectId String
+  supportProject   SupportProject   @relation(fields: [supportProjectId], references: [id], onDelete: Cascade)
+  userId           String
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  message          String
+  status           VolunteerStatus  @default(APPLIED)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
 }

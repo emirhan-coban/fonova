@@ -6,13 +6,14 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "vercel-build": "prisma generate && (python3 scripts/bootstrap-sqlite.py || python scripts/bootstrap-sqlite.py) && prisma db seed && next build",
+    "vercel-build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev --name init",
     "prisma:seed": "prisma db seed",
-    "db:bootstrap": "python scripts/bootstrap-sqlite.py",
+    "db:up": "docker compose up -d postgres",
+    "db:reset": "prisma migrate reset --force",
     "test": "vitest run",
     "test:watch": "vitest"
   },

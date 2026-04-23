@@ -5,9 +5,8 @@ const nextConfig = {
       bodySizeLimit: "2mb"
     }
   },
-  outputFileTracingIncludes: {
-    "/*": ["./prisma/dev.db"]
-  }
+  // PostgreSQL — no local DB file needed
+  // outputFileTracingIncludes removed (was for SQLite)
 };
 
 export default nextConfig;

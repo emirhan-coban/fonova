@@ -60,11 +60,28 @@ export const mockEscrowAdapter: EscrowAdapter = {
 
 export const mockKycAdapter: KycAdapter = {
   async verifyIdentity(input) {
+    const tcValid = /^\d{11}$/.test(input.tcKimlikNo);
+    if (!tcValid) {
+      return {
+        ok: false,
+        reference: reference("KYC"),
+        code: "KYC02",
+        message: "Geçersiz TC Kimlik numarası formatı."
+      };
+    }
     return {
       ok: true,
       reference: reference("KYC"),
       code: "KYC00",
       message: `${input.fullName} için kimlik doğrulama simülasyonu başarılı.`
+    };
+  },
+  async checkStatus(input) {
+    return {
+      ok: true,
+      reference: input.reference,
+      code: "KYC00",
+      message: "KYC doğrulaması tamamlandı (simülasyon)."
     };
   }
 };

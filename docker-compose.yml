@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: fonova-postgres
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: fonova
+      POSTGRES_PASSWORD: fonova
+      POSTGRES_DB: fonova
+    volumes:
+      - fonova_pgdata:/var/lib/postgresql/data
+
+volumes:
+  fonova_pgdata:

@@ -3,12 +3,7 @@ import { prisma } from "@/lib/db";
 import { mockEscrowAdapter, mockMkkAdapter } from "@/lib/adapters/mock";
 import { checkCampaignCapacity, checkInvestorLimit, coolingOffDeadline } from "@/lib/compliance/engine";
 import { isCoolingOffOpen } from "@/lib/campaigns";
-
-export type ServiceResult<T> = {
-  ok: boolean;
-  message: string;
-  data?: T;
-};
+import type { ServiceResult } from "./types";
 
 export async function createInvestmentIntent(input: {
   campaignSlug: string;
