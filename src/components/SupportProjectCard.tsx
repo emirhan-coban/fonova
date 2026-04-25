@@ -37,7 +37,7 @@ export function SupportProjectCard({ project }: { project: SupportProject }) {
 
   return (
     <article className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_20px_58px_-50px_rgba(46,9,136,0.16)] transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1 hover:border-accent/20">
-      <div className={`relative min-h-44 overflow-hidden bg-gradient-to-br ${artwork.shell} sm:min-h-48`}>
+      <div className={`relative min-h-56 overflow-hidden bg-gradient-to-br ${artwork.shell} sm:min-h-60`}>
         <div className={`absolute -left-8 top-5 h-24 w-24 rounded-full blur-2xl ${artwork.orb}`} />
         <div className={`absolute right-0 top-0 h-full w-2/3 bg-gradient-to-bl ${artwork.line}`} />
         <div className="absolute inset-x-6 bottom-6 top-6 rounded-[1.65rem] border border-white/65 bg-white/28 backdrop-blur-md" />
@@ -49,7 +49,7 @@ export function SupportProjectCard({ project }: { project: SupportProject }) {
         </div>
         <div className="absolute bottom-8 left-8 right-8">
           <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-600">{project.city}</p>
-          <p className="mt-2 max-w-[18rem] text-lg font-semibold leading-tight text-slate-950">{project.organization}</p>
+          <p className="mt-2 truncate text-lg font-semibold leading-tight text-slate-950">{project.organization}</p>
         </div>
       </div>
       <div className="p-5 sm:p-6">

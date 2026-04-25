@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import FloatingAIButton from "@/components/FloatingAIButton";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
@@ -110,6 +111,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           </header>
 
           <div className="pt-24 sm:pt-28 lg:pt-16">{children}</div>
+
+          <FloatingAIButton />
 
           <footer className="w-full border-t border-slate-200/80 bg-white pb-10 pt-14 sm:pt-20">
             <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 sm:grid-cols-2 sm:px-6 md:grid-cols-4 lg:grid-cols-6 lg:px-8">

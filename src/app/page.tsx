@@ -9,6 +9,7 @@ import {
   Heart,
   ShieldCheck
 } from "@phosphor-icons/react/dist/ssr";
+import AIAdvisor from "@/components/AIAdvisor";
 import { CampaignCard } from "@/components/CampaignCard";
 import { SupportProjectCard } from "@/components/SupportProjectCard";
 import { campaignProgress } from "@/lib/campaigns";
@@ -127,6 +128,8 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      <AIAdvisor />
 
       <section id="yatirim-projeleri" className="px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
         <div className="mx-auto max-w-7xl">
